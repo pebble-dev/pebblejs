@@ -13,162 +13,117 @@
  * @param x
  * @param y
  */
-var Vector2 = function ( x, y ) {
-
+var Vector2 = function (x, y) {
   this.x = x || 0;
   this.y = y || 0;
-
 };
 
 Vector2.prototype = {
-
   constructor: Vector2,
 
-  set: function ( x, y ) {
-
+  set: function (x, y) {
     this.x = x;
     this.y = y;
 
     return this;
-
   },
 
-  copy: function ( v ) {
-
+  copy: function (v) {
     this.x = v.x;
     this.y = v.y;
 
     return this;
-
   },
 
   clone: function () {
-
-    return new Vector2( this.x, this.y );
-
+    return new Vector2(this.x, this.y);
   },
 
-  add: function ( v1, v2 ) {
-
+  add: function (v1, v2) {
     this.x = v1.x + v2.x;
     this.y = v1.y + v2.y;
 
     return this;
-
   },
 
-  addSelf: function ( v ) {
-
+  addSelf: function (v) {
     this.x += v.x;
     this.y += v.y;
 
     return this;
-
   },
 
-  sub: function ( v1, v2 ) {
-
+  sub: function (v1, v2) {
     this.x = v1.x - v2.x;
     this.y = v1.y - v2.y;
 
     return this;
-
   },
 
-  subSelf: function ( v ) {
-
+  subSelf: function (v) {
     this.x -= v.x;
     this.y -= v.y;
 
     return this;
-
   },
 
-  multiplyScalar: function ( s ) {
-
+  multiplyScalar: function (s) {
     this.x *= s;
     this.y *= s;
 
     return this;
-
   },
 
-  divideScalar: function ( s ) {
-
-    if ( s ) {
-
+  divideScalar: function (s) {
+    if (s) {
       this.x /= s;
       this.y /= s;
-
     } else {
-
-      this.set( 0, 0 );
-
+      this.set(0, 0);
     }
 
     return this;
-
   },
 
-
-  negate: function() {
-
-    return this.multiplyScalar( -1 );
-
+  negate: function () {
+    return this.multiplyScalar(-1);
   },
 
-  dot: function ( v ) {
-
+  dot: function (v) {
     return this.x * v.x + this.y * v.y;
-
   },
 
   lengthSq: function () {
-
     return this.x * this.x + this.y * this.y;
-
   },
 
   length: function () {
-
-    return Math.sqrt( this.lengthSq() );
-
+    return Math.sqrt(this.lengthSq());
   },
 
   normalize: function () {
-
-    return this.divideScalar( this.length() );
-
+    return this.divideScalar(this.length());
   },
 
-  distanceTo: function ( v ) {
-
-    return Math.sqrt( this.distanceToSquared( v ) );
-
+  distanceTo: function (v) {
+    return Math.sqrt(this.distanceToSquared(v));
   },
 
-  distanceToSquared: function ( v ) {
-
-    var dx = this.x - v.x, dy = this.y - v.y;
+  distanceToSquared: function (v) {
+    var dx = this.x - v.x,
+      dy = this.y - v.y;
     return dx * dx + dy * dy;
-
   },
 
-
-  setLength: function ( l ) {
-
-    return this.normalize().multiplyScalar( l );
-
+  setLength: function (l) {
+    return this.normalize().multiplyScalar(l);
   },
 
-  equals: function( v ) {
-
-    return ( ( v.x === this.x ) && ( v.y === this.y ) );
-
-  }
-
+  equals: function (v) {
+    return v.x === this.x && v.y === this.y;
+  },
 };
 
-if (typeof module !== 'undefined') {
+if (typeof module !== "undefined") {
   module.exports = Vector2;
 }

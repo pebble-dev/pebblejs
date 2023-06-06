@@ -21,32 +21,41 @@
 */
 
 var Zlib;
-if (typeof require !== 'undefined') {
-  Zlib = require('zlib');
+if (typeof require !== "undefined") {
+  Zlib = require("zlib");
 } else {
   Zlib = window.Zlib;
 }
 
-(function() {
+(function () {
   var PNG;
 
-  PNG = (function() {
-    var APNG_BLEND_OP_OVER, APNG_BLEND_OP_SOURCE, APNG_DISPOSE_OP_BACKGROUND, APNG_DISPOSE_OP_NONE, APNG_DISPOSE_OP_PREVIOUS, makeImage, scratchCanvas, scratchCtx;
+  PNG = (function () {
+    var APNG_BLEND_OP_OVER,
+      APNG_BLEND_OP_SOURCE,
+      APNG_DISPOSE_OP_BACKGROUND,
+      APNG_DISPOSE_OP_NONE,
+      APNG_DISPOSE_OP_PREVIOUS,
+      makeImage,
+      scratchCanvas,
+      scratchCtx;
 
-    PNG.load = function(url, canvas, callback) {
+    PNG.load = function (url, canvas, callback) {
       var xhr,
         _this = this;
-      if (typeof canvas === 'function') {
+      if (typeof canvas === "function") {
         callback = canvas;
       }
-      xhr = new XMLHttpRequest;
+      xhr = new XMLHttpRequest();
       xhr.open("GET", url, true);
       xhr.responseType = "arraybuffer";
-      xhr.onload = function() {
+      xhr.onload = function () {
         var data, png;
         data = new Uint8Array(xhr.response || xhr.mozResponseArrayBuffer);
         png = new PNG(data);
-        if (typeof (canvas != null ? canvas.getContext : void 0) === 'function') {
+        if (
+          typeof (canvas != null ? canvas.getContext : void 0) === "function"
+        ) {
           png.render(canvas);
         }
         return typeof callback === "function" ? callback(png) : void 0;
@@ -65,7 +74,20 @@ if (typeof require !== 'undefined') {
     APNG_BLEND_OP_OVER = 1;
 
     function PNG(data) {
-      var chunkSize, colors, delayDen, delayNum, frame, i, index, key, section, short, text, _i, _j, _ref;
+      var chunkSize,
+        colors,
+        delayDen,
+        delayNum,
+        frame,
+        i,
+        index,
+        key,
+        section,
+        short,
+        text,
+        _i,
+        _j,
+        _ref;
       this.data = data;
       this.pos = 8;
       this.palette = [];
@@ -76,16 +98,18 @@ if (typeof require !== 'undefined') {
       frame = null;
       while (true) {
         chunkSize = this.readUInt32();
-        section = ((function() {
+        section = function () {
           var _i, _results;
           _results = [];
           for (i = _i = 0; _i < 4; i = ++_i) {
             _results.push(String.fromCharCode(this.data[this.pos++]));
           }
           return _results;
-        }).call(this)).join('');
+        }
+          .call(this)
+          .join("");
         switch (section) {
-          case 'IHDR':
+          case "IHDR":
             this.width = this.readUInt32();
             this.height = this.readUInt32();
             this.bits = this.data[this.pos++];
@@ -94,17 +118,17 @@ if (typeof require !== 'undefined') {
             this.filterMethod = this.data[this.pos++];
             this.interlaceMethod = this.data[this.pos++];
             break;
-          case 'acTL':
+          case "acTL":
             this.animation = {
               numFrames: this.readUInt32(),
               numPlays: this.readUInt32() || Infinity,
-              frames: []
+              frames: [],
             };
             break;
-          case 'PLTE':
+          case "PLTE":
             this.palette = this.read(chunkSize);
             break;
-          case 'fcTL':
+          case "fcTL":
             if (frame) {
               this.animation.frames.push(frame);
             }
@@ -113,34 +137,42 @@ if (typeof require !== 'undefined') {
               width: this.readUInt32(),
               height: this.readUInt32(),
               xOffset: this.readUInt32(),
-              yOffset: this.readUInt32()
+              yOffset: this.readUInt32(),
             };
             delayNum = this.readUInt16();
             delayDen = this.readUInt16() || 100;
-            frame.delay = 1000 * delayNum / delayDen;
+            frame.delay = (1000 * delayNum) / delayDen;
             frame.disposeOp = this.data[this.pos++];
             frame.blendOp = this.data[this.pos++];
             frame.data = [];
             break;
-          case 'IDAT':
-          case 'fdAT':
-            if (section === 'fdAT') {
+          case "IDAT":
+          case "fdAT":
+            if (section === "fdAT") {
               this.pos += 4;
               chunkSize -= 4;
             }
             data = (frame != null ? frame.data : void 0) || this.imgData;
-            for (i = _i = 0; 0 <= chunkSize ? _i < chunkSize : _i > chunkSize; i = 0 <= chunkSize ? ++_i : --_i) {
+            for (
+              i = _i = 0;
+              0 <= chunkSize ? _i < chunkSize : _i > chunkSize;
+              i = 0 <= chunkSize ? ++_i : --_i
+            ) {
               data.push(this.data[this.pos++]);
             }
             break;
-          case 'tRNS':
+          case "tRNS":
             this.transparency = {};
             switch (this.colorType) {
               case 3:
                 this.transparency.indexed = this.read(chunkSize);
                 short = 255 - this.transparency.indexed.length;
                 if (short > 0) {
-                  for (i = _j = 0; 0 <= short ? _j < short : _j > short; i = 0 <= short ? ++_j : --_j) {
+                  for (
+                    i = _j = 0;
+                    0 <= short ? _j < short : _j > short;
+                    i = 0 <= short ? ++_j : --_j
+                  ) {
                     this.transparency.indexed.push(255);
                   }
                 }
@@ -152,17 +184,20 @@ if (typeof require !== 'undefined') {
                 this.transparency.rgb = this.read(chunkSize);
             }
             break;
-          case 'tEXt':
+          case "tEXt":
             text = this.read(chunkSize);
             index = text.indexOf(0);
             key = String.fromCharCode.apply(String, text.slice(0, index));
-            this.text[key] = String.fromCharCode.apply(String, text.slice(index + 1));
+            this.text[key] = String.fromCharCode.apply(
+              String,
+              text.slice(index + 1)
+            );
             break;
-          case 'IEND':
+          case "IEND":
             if (frame) {
               this.animation.frames.push(frame);
             }
-            this.colors = (function() {
+            this.colors = function () {
               switch (this.colorType) {
                 case 0:
                 case 3:
@@ -172,18 +207,18 @@ if (typeof require !== 'undefined') {
                 case 6:
                   return 3;
               }
-            }).call(this);
+            }.call(this);
             this.hasAlphaChannel = (_ref = this.colorType) === 4 || _ref === 6;
             colors = this.colors + (this.hasAlphaChannel ? 1 : 0);
             this.pixelBitlength = this.bits * colors;
-            this.colorSpace = (function() {
+            this.colorSpace = function () {
               switch (this.colors) {
                 case 1:
-                  return 'DeviceGray';
+                  return "DeviceGray";
                 case 3:
-                  return 'DeviceRGB';
+                  return "DeviceRGB";
               }
-            }).call(this);
+            }.call(this);
             this.imgData = new Uint8Array(this.imgData);
             return;
           default:
@@ -197,16 +232,20 @@ if (typeof require !== 'undefined') {
       return;
     }
 
-    PNG.prototype.read = function(bytes) {
+    PNG.prototype.read = function (bytes) {
       var i, _i, _results;
       _results = [];
-      for (i = _i = 0; 0 <= bytes ? _i < bytes : _i > bytes; i = 0 <= bytes ? ++_i : --_i) {
+      for (
+        i = _i = 0;
+        0 <= bytes ? _i < bytes : _i > bytes;
+        i = 0 <= bytes ? ++_i : --_i
+      ) {
         _results.push(this.data[this.pos++]);
       }
       return _results;
     };
 
-    PNG.prototype.readUInt32 = function() {
+    PNG.prototype.readUInt32 = function () {
       var b1, b2, b3, b4;
       b1 = this.data[this.pos++] << 24;
       b2 = this.data[this.pos++] << 16;
@@ -215,15 +254,37 @@ if (typeof require !== 'undefined') {
       return b1 | b2 | b3 | b4;
     };
 
-    PNG.prototype.readUInt16 = function() {
+    PNG.prototype.readUInt16 = function () {
       var b1, b2;
       b1 = this.data[this.pos++] << 8;
       b2 = this.data[this.pos++];
       return b1 | b2;
     };
 
-    PNG.prototype.decodePixels = function(data) {
-      var byte, c, col, i, left, length, p, pa, paeth, pb, pc, pixelBytes, pixels, pos, row, scanlineLength, upper, upperLeft, _i, _j, _k, _l, _m;
+    PNG.prototype.decodePixels = function (data) {
+      var byte,
+        c,
+        col,
+        i,
+        left,
+        length,
+        p,
+        pa,
+        paeth,
+        pb,
+        pc,
+        pixelBytes,
+        pixels,
+        pos,
+        row,
+        scanlineLength,
+        upper,
+        upperLeft,
+        _i,
+        _j,
+        _k,
+        _l,
+        _m;
       if (data == null) {
         data = this.imgData;
       }
@@ -257,7 +318,13 @@ if (typeof require !== 'undefined') {
             for (i = _k = 0; _k < scanlineLength; i = _k += 1) {
               byte = data[pos++];
               col = (i - (i % pixelBytes)) / pixelBytes;
-              upper = row && pixels[(row - 1) * scanlineLength + col * pixelBytes + (i % pixelBytes)];
+              upper =
+                row &&
+                pixels[
+                  (row - 1) * scanlineLength +
+                    col * pixelBytes +
+                    (i % pixelBytes)
+                ];
               pixels[c++] = (upper + byte) % 256;
             }
             break;
@@ -266,7 +333,13 @@ if (typeof require !== 'undefined') {
               byte = data[pos++];
               col = (i - (i % pixelBytes)) / pixelBytes;
               left = i < pixelBytes ? 0 : pixels[c - pixelBytes];
-              upper = row && pixels[(row - 1) * scanlineLength + col * pixelBytes + (i % pixelBytes)];
+              upper =
+                row &&
+                pixels[
+                  (row - 1) * scanlineLength +
+                    col * pixelBytes +
+                    (i % pixelBytes)
+                ];
               pixels[c++] = (byte + Math.floor((left + upper) / 2)) % 256;
             }
             break;
@@ -278,8 +351,19 @@ if (typeof require !== 'undefined') {
               if (row === 0) {
                 upper = upperLeft = 0;
               } else {
-                upper = pixels[(row - 1) * scanlineLength + col * pixelBytes + (i % pixelBytes)];
-                upperLeft = col && pixels[(row - 1) * scanlineLength + (col - 1) * pixelBytes + (i % pixelBytes)];
+                upper =
+                  pixels[
+                    (row - 1) * scanlineLength +
+                      col * pixelBytes +
+                      (i % pixelBytes)
+                  ];
+                upperLeft =
+                  col &&
+                  pixels[
+                    (row - 1) * scanlineLength +
+                      (col - 1) * pixelBytes +
+                      (i % pixelBytes)
+                  ];
               }
               p = left + upper - upperLeft;
               pa = Math.abs(p - left);
@@ -303,7 +387,7 @@ if (typeof require !== 'undefined') {
       return pixels;
     };
 
-    PNG.prototype.decodePalette = function() {
+    PNG.prototype.decodePalette = function () {
       var c, i, length, palette, pos, ret, transparency, _i, _ref, _ref1;
       palette = this.palette;
       transparency = this.transparency.indexed || [];
@@ -320,13 +404,16 @@ if (typeof require !== 'undefined') {
       return ret;
     };
 
-    PNG.prototype.copyToImageData = function(imageData, pixels) {
+    PNG.prototype.copyToImageData = function (imageData, pixels) {
       var alpha, colors, data, i, input, j, k, length, palette, v, _ref;
       colors = this.colors;
       palette = null;
       alpha = this.hasAlphaChannel;
       if (this.palette.length) {
-        palette = (_ref = this._decodedPalette) != null ? _ref : this._decodedPalette = this.decodePalette();
+        palette =
+          (_ref = this._decodedPalette) != null
+            ? _ref
+            : (this._decodedPalette = this.decodePalette());
         colors = 4;
         alpha = true;
       }
@@ -356,25 +443,25 @@ if (typeof require !== 'undefined') {
       }
     };
 
-    PNG.prototype.decode = function() {
+    PNG.prototype.decode = function () {
       var ret;
       ret = new Uint8Array(this.width * this.height * 4);
       this.copyToImageData(ret, this.decodePixels());
       return ret;
     };
 
-    makeImage = function(imageData) {
+    makeImage = function (imageData) {
       var img;
       scratchCtx.width = imageData.width;
       scratchCtx.height = imageData.height;
       scratchCtx.clearRect(0, 0, imageData.width, imageData.height);
       scratchCtx.putImageData(imageData, 0, 0);
-      img = new Image;
+      img = new Image();
       img.src = scratchCanvas.toDataURL();
       return img;
     };
 
-    PNG.prototype.decodeFrames = function(ctx) {
+    PNG.prototype.decodeFrames = function (ctx) {
       var frame, i, imageData, pixels, _i, _len, _ref, _results;
       if (!this.animation) {
         return;
@@ -387,12 +474,12 @@ if (typeof require !== 'undefined') {
         pixels = this.decodePixels(new Uint8Array(frame.data));
         this.copyToImageData(imageData, pixels);
         frame.imageData = imageData;
-        _results.push(frame.image = makeImage(imageData));
+        _results.push((frame.image = makeImage(imageData)));
       }
       return _results;
     };
 
-    PNG.prototype.renderFrame = function(ctx, number) {
+    PNG.prototype.renderFrame = function (ctx, number) {
       var frame, frames, prev;
       frames = this.animation.frames;
       frame = frames[number];
@@ -400,9 +487,13 @@ if (typeof require !== 'undefined') {
       if (number === 0) {
         ctx.clearRect(0, 0, this.width, this.height);
       }
-      if ((prev != null ? prev.disposeOp : void 0) === APNG_DISPOSE_OP_BACKGROUND) {
+      if (
+        (prev != null ? prev.disposeOp : void 0) === APNG_DISPOSE_OP_BACKGROUND
+      ) {
         ctx.clearRect(prev.xOffset, prev.yOffset, prev.width, prev.height);
-      } else if ((prev != null ? prev.disposeOp : void 0) === APNG_DISPOSE_OP_PREVIOUS) {
+      } else if (
+        (prev != null ? prev.disposeOp : void 0) === APNG_DISPOSE_OP_PREVIOUS
+      ) {
         ctx.putImageData(prev.imageData, prev.xOffset, prev.yOffset);
       }
       if (frame.blendOp === APNG_BLEND_OP_SOURCE) {
@@ -411,28 +502,38 @@ if (typeof require !== 'undefined') {
       return ctx.drawImage(frame.image, frame.xOffset, frame.yOffset);
     };
 
-    PNG.prototype.animate = function(ctx) {
-      var doFrame, frameNumber, frames, numFrames, numPlays, _ref,
+    PNG.prototype.animate = function (ctx) {
+      var doFrame,
+        frameNumber,
+        frames,
+        numFrames,
+        numPlays,
+        _ref,
         _this = this;
       frameNumber = 0;
-      _ref = this.animation, numFrames = _ref.numFrames, frames = _ref.frames, numPlays = _ref.numPlays;
-      return (doFrame = function() {
+      (_ref = this.animation),
+        (numFrames = _ref.numFrames),
+        (frames = _ref.frames),
+        (numPlays = _ref.numPlays);
+      return (doFrame = function () {
         var f, frame;
         f = frameNumber++ % numFrames;
         frame = frames[f];
         _this.renderFrame(ctx, f);
         if (numFrames > 1 && frameNumber / numFrames < numPlays) {
-          return _this.animation._timeout = setTimeout(doFrame, frame.delay);
+          return (_this.animation._timeout = setTimeout(doFrame, frame.delay));
         }
       })();
     };
 
-    PNG.prototype.stopAnimation = function() {
+    PNG.prototype.stopAnimation = function () {
       var _ref;
-      return clearTimeout((_ref = this.animation) != null ? _ref._timeout : void 0);
+      return clearTimeout(
+        (_ref = this.animation) != null ? _ref._timeout : void 0
+      );
     };
 
-    PNG.prototype.render = function(canvas) {
+    PNG.prototype.render = function (canvas) {
       var ctx, data;
       if (canvas._png) {
         canvas._png.stopAnimation();
@@ -452,13 +553,11 @@ if (typeof require !== 'undefined') {
     };
 
     return PNG;
-
   })();
 
-  if (typeof module !== 'undefined') {
+  if (typeof module !== "undefined") {
     module.exports = PNG;
   } else {
     window.PNG = PNG;
   }
-
 }).call(this);

@@ -1,3 +1,3 @@
-var Wakeup = require('./wakeup');
+var Wakeup = require("./wakeup");
 
 module.exports = Wakeup;

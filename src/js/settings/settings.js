@@ -1,35 +1,37 @@
-var util2 = require('lib/util2');
-var myutil = require('lib/myutil');
-var safe = require('lib/safe');
-var ajax = require('lib/ajax');
-var appinfo = require('appinfo');
+var util2 = require("lib/util2");
+var myutil = require("lib/myutil");
+var safe = require("lib/safe");
+var ajax = require("lib/ajax");
+var appinfo = require("appinfo");
 
 var Settings = module.exports;
 
-var parseJson = function(data) {
+var parseJson = function (data) {
   try {
     return JSON.parse(data);
   } catch (e) {
-    safe.warn('Invalid JSON in localStorage: ' + (e.message || '') + '\n\t' + data);
+    safe.warn(
+      "Invalid JSON in localStorage: " + (e.message || "") + "\n\t" + data
+    );
   }
 };
 
 var state;
 
-Settings.settingsUrl = 'http://meiguro.com/simplyjs/settings.html';
+Settings.settingsUrl = "http://meiguro.com/simplyjs/settings.html";
 
-Settings.init = function() {
+Settings.init = function () {
   Settings.reset();
 
   Settings._loadOptions();
   Settings._loadData();
 
   // Register listeners for the Settings
-  Pebble.addEventListener('showConfiguration', Settings.onOpenConfig);
-  Pebble.addEventListener('webviewclosed', Settings.onCloseConfig);
+  Pebble.addEventListener("showConfiguration", Settings.onOpenConfig);
+  Pebble.addEventListener("webviewclosed", Settings.onCloseConfig);
 };
 
-Settings.reset = function() {
+Settings.reset = function () {
   state = Settings.state = {
     options: {},
     data: {},
@@ -38,36 +40,36 @@ Settings.reset = function() {
   };
 };
 
-var toHttpUrl = function(url) {
-  if (typeof url === 'string' && url.length && !url.match(/^(\w+:)?\/\//)) {
-    url = 'http://' + url;
+var toHttpUrl = function (url) {
+  if (typeof url === "string" && url.length && !url.match(/^(\w+:)?\/\//)) {
+    url = "http://" + url;
   }
   return url;
 };
 
-Settings.mainScriptUrl = function(scriptUrl) {
+Settings.mainScriptUrl = function (scriptUrl) {
   scriptUrl = toHttpUrl(scriptUrl);
   if (scriptUrl) {
-    localStorage.setItem('mainJsUrl', scriptUrl);
+    localStorage.setItem("mainJsUrl", scriptUrl);
   } else {
-    scriptUrl = localStorage.getItem('mainJsUrl');
+    scriptUrl = localStorage.getItem("mainJsUrl");
   }
   return scriptUrl;
 };
 
-Settings.getBaseOptions = function() {
+Settings.getBaseOptions = function () {
   return {
     scriptUrl: Settings.mainScriptUrl(),
   };
 };
 
-Settings._getDataKey = function(path, field) {
+Settings._getDataKey = function (path, field) {
   path = path || appinfo.uuid;
-  return field + ':' + path;
+  return field + ":" + path;
 };
 
-Settings._saveData = function(path, field, data) {
-  field = field || 'data';
+Settings._saveData = function (path, field, data) {
+  field = field || "data";
   if (data) {
     state[field] = data;
   } else {
@@ -77,40 +79,40 @@ Settings._saveData = function(path, field, data) {
   localStorage.setItem(key, JSON.stringify(data));
 };
 
-Settings._loadData = function(path, field, nocache) {
-  field = field || 'data';
+Settings._loadData = function (path, field, nocache) {
+  field = field || "data";
   state[field] = {};
   var key = Settings._getDataKey(path, field);
   var value = localStorage.getItem(key);
   var data = parseJson(value);
-  if (value && typeof data === 'undefined') {
+  if (value && typeof data === "undefined") {
     // There was an issue loading the data, remove it
     localStorage.removeItem(key);
   }
-  if (!nocache && typeof data === 'object' && data !== null) {
+  if (!nocache && typeof data === "object" && data !== null) {
     state[field] = data;
   }
   return data;
 };
 
-Settings._saveOptions = function(path) {
-  Settings._saveData(path, 'options');
+Settings._saveOptions = function (path) {
+  Settings._saveData(path, "options");
 };
 
-Settings._loadOptions = function(path) {
-  Settings._loadData(path, 'options');
+Settings._loadOptions = function (path) {
+  Settings._loadData(path, "options");
 };
 
-var makeDataAccessor = function(type, path) {
-  return function(field, value) {
+var makeDataAccessor = function (type, path) {
+  return function (field, value) {
     var data = state[type];
     if (arguments.length === 0) {
       return data;
     }
-    if (arguments.length === 1 && typeof field !== 'object') {
+    if (arguments.length === 1 && typeof field !== "object") {
       return data[field];
     }
-    if (typeof field !== 'object' && value === undefined || value === null) {
+    if ((typeof field !== "object" && value === undefined) || value === null) {
       delete data[field];
     }
     var def = myutil.toObject(field, value);
@@ -119,12 +121,12 @@ var makeDataAccessor = function(type, path) {
   };
 };
 
-Settings.option = makeDataAccessor('options');
+Settings.option = makeDataAccessor("options");
 
-Settings.data = makeDataAccessor('data');
+Settings.data = makeDataAccessor("data");
 
-Settings.config = function(opt, open, close) {
-  if (typeof opt === 'string') {
+Settings.config = function (opt, open, close) {
+  if (typeof opt === "string") {
     opt = { url: opt };
   }
   opt.url = toHttpUrl(opt.url);
@@ -140,7 +142,7 @@ Settings.config = function(opt, open, close) {
   state.listeners.push(listener);
 };
 
-Settings.onOpenConfig = function(e) {
+Settings.onOpenConfig = function (e) {
   var options;
   var url;
   var listener = util2.last(state.listeners);
@@ -157,7 +159,7 @@ Settings.onOpenConfig = function(e) {
         return;
       }
     }
-    url = typeof result === 'string' ? result : listener.params.url;
+    url = typeof result === "string" ? result : listener.params.url;
     options = state.options;
   } else {
     url = Settings.settingsUrl;
@@ -165,15 +167,15 @@ Settings.onOpenConfig = function(e) {
     return;
   }
   if (listener.params.hash !== false) {
-    url += '#' + encodeURIComponent(JSON.stringify(options));
+    url += "#" + encodeURIComponent(JSON.stringify(options));
   }
   Pebble.openURL(url);
 };
 
-Settings.onCloseConfig = function(e) {
+Settings.onCloseConfig = function (e) {
   // Work around for PebbleKit JS Android
   // On Android, an extra cancelled event occurs after a normal close
-  if (e.response !== 'CANCELLED') {
+  if (e.response !== "CANCELLED") {
     state.ignoreCancelled++;
   } else if (state.ignoreCancelled > 0) {
     state.ignoreCancelled--;
@@ -184,13 +186,13 @@ Settings.onCloseConfig = function(e) {
   var format;
   if (e.response) {
     options = parseJson(decodeURIComponent(e.response));
-    if (typeof options === 'object' && options !== null) {
-      format = 'json';
+    if (typeof options === "object" && options !== null) {
+      format = "json";
     }
     if (!format && e.response.match(/(&|=)/)) {
       options = ajax.deformify(e.response);
       if (util2.count(options) > 0) {
-        format = 'form';
+        format = "form";
       }
     }
   }

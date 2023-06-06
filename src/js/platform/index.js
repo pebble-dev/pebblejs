@@ -1,3 +1,3 @@
-var Platform = require('./platform');
+var Platform = require("./platform");
 
 module.exports = Platform;

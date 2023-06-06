@@ -1,8 +1,6 @@
 {
   "appKeys": {},
-  "capabilities": [
-    "configurable"
-  ],
+  "capabilities": ["configurable"],
   "companyName": "Meiguro",
   "longName": "Pebble.js",
   "resources": {
@@ -32,13 +30,7 @@
   },
   "sdkVersion": "3",
   "shortName": "Pebble.js",
-  "targetPlatforms": [
-    "aplite",
-    "basalt",
-    "chalk",
-    "diorite",
-    "emery"
-  ],
+  "targetPlatforms": ["aplite", "basalt", "chalk", "diorite", "emery"],
   "uuid": "133215f0-cf20-4c05-997b-3c9be5a64e5b",
   "versionCode": 1,
   "versionLabel": "0.4",

@@ -1,16 +1,16 @@
-var Emitter = require('emitter');
+var Emitter = require("emitter");
 
 var Accel = new Emitter();
 
 module.exports = Accel;
 
-var WindowStack = require('ui/windowstack');
-var Window = require('ui/window');
-var simply = require('ui/simply');
+var WindowStack = require("ui/windowstack");
+var Window = require("ui/window");
+var simply = require("ui/simply");
 
 var state;
 
-Accel.init = function() {
+Accel.init = function () {
   if (state) {
     Accel.off();
   }
@@ -19,35 +19,37 @@ Accel.init = function() {
     rate: 100,
     samples: 25,
     subscribe: false,
-    subscribeMode: 'auto',
+    subscribeMode: "auto",
     listeners: [],
   };
 };
 
-Accel.onAddHandler = function(type, subtype) {
-  if (type === 'data') {
+Accel.onAddHandler = function (type, subtype) {
+  if (type === "data") {
     Accel.autoSubscribe();
   }
 };
 
-Accel.onRemoveHandler = function(type, subtype) {
-  if (!type || type === 'accelData') {
+Accel.onRemoveHandler = function (type, subtype) {
+  if (!type || type === "accelData") {
     Accel.autoSubscribe();
   }
 };
 
-var accelDataListenerCount = function() {
-  var count = Accel.listenerCount('data');
+var accelDataListenerCount = function () {
+  var count = Accel.listenerCount("data");
   var wind = WindowStack.top();
   if (wind) {
-    count += wind.listenerCount('accelData');
+    count += wind.listenerCount("accelData");
   }
   return count;
 };
 
-Accel.autoSubscribe = function() {
-  if (state.subscribeMode !== 'auto') { return; }
-  var subscribe = (accelDataListenerCount() > 0);
+Accel.autoSubscribe = function () {
+  if (state.subscribeMode !== "auto") {
+    return;
+  }
+  var subscribe = accelDataListenerCount() > 0;
   if (subscribe !== state.subscribe) {
     return Accel.config(subscribe, true);
   }
@@ -69,19 +71,19 @@ Accel.autoSubscribe = function() {
  * @memberOf simply
  * @param {simply.accelConfig} accelConf - An object defining the accelerometer configuration.
  */
-Accel.config = function(opt, auto) {
+Accel.config = function (opt, auto) {
   if (arguments.length === 0) {
     return {
       rate: state.rate,
       samples: state.samples,
       subscribe: state.subscribe,
     };
-  } else if (typeof opt === 'boolean') {
+  } else if (typeof opt === "boolean") {
     opt = { subscribe: opt };
   }
   for (var k in opt) {
-    if (k === 'subscribe') {
-      state.subscribeMode = opt[k] && !auto ? 'manual' : 'auto';
+    if (k === "subscribe") {
+      state.subscribeMode = opt[k] && !auto ? "manual" : "auto";
     }
     state[k] = opt[k];
   }
@@ -93,9 +95,9 @@ Accel.config = function(opt, auto) {
  * @memberOf simply
  * @param {simply.eventHandler} callback - A callback function that will be provided the accel data point as an event.
  */
-Accel.peek = function(callback) {
+Accel.peek = function (callback) {
   if (state.subscribe) {
-    throw new Error('Cannot use accelPeek when listening to accelData events');
+    throw new Error("Cannot use accelPeek when listening to accelData events");
   }
   return simply.impl.accelPeek.apply(this, arguments);
 };
@@ -108,15 +110,15 @@ Accel.peek = function(callback) {
  * @property {number} direction - The direction of the tap along the axis: 1 or -1.
  */
 
-Accel.emitAccelTap = function(axis, direction) {
+Accel.emitAccelTap = function (axis, direction) {
   var e = {
     axis: axis,
     direction: direction,
   };
-  if (Window.emit('accelTap', axis, e) === false) {
+  if (Window.emit("accelTap", axis, e) === false) {
     return false;
   }
-  Accel.emit('tap', axis, e);
+  Accel.emit("tap", axis, e);
 };
 
 /**
@@ -139,7 +141,7 @@ Accel.emitAccelTap = function(axis, direction) {
  * @property {simply.accelPoint[]} accels - The accelerometer samples in an array.
  */
 
-Accel.emitAccelData = function(accels, callback) {
+Accel.emitAccelData = function (accels, callback) {
   var e = {
     samples: accels.length,
     accel: accels[0],
@@ -148,10 +150,10 @@ Accel.emitAccelData = function(accels, callback) {
   if (callback) {
     return callback(e);
   }
-  if (Window.emit('accelData', null, e) === false) {
+  if (Window.emit("accelData", null, e) === false) {
     return false;
   }
-  Accel.emit('data', e);
+  Accel.emit("data", e);
 };
 
 Accel.init();

@@ -1,6 +1,6 @@
 plugins:
-    - jekyll-remote-theme
-    
+  - jekyll-remote-theme
+
 remote_theme: just-the-docs/just-the-docs
 
 title: Pebble.js Docs
@@ -80,7 +80,7 @@ navigation:
       - name: Radial
         link: ./radial.html
       - name: Rectangle
-        link: ./rect.html        
+        link: ./rect.html
   - name: Miscellaneous
     sublist:
       - name: Timeline
@@ -88,5 +88,4 @@ navigation:
       - name: Wakeup
         link: ./wakeup.html
       - name: Vector2
-        link: ./vector2.html     
-        
+        link: ./vector2.html

@@ -1,10 +1,10 @@
 var Timeline = module.exports;
 
-Timeline.init = function() {
+Timeline.init = function () {
   this._launchCallbacks = [];
 };
 
-Timeline.launch = function(callback) {
+Timeline.launch = function (callback) {
   if (this._launchEvent) {
     callback(this._launchEvent);
   } else {
@@ -12,7 +12,7 @@ Timeline.launch = function(callback) {
   }
 };
 
-Timeline.emitAction = function(args) {
+Timeline.emitAction = function (args) {
   var e;
   if (args !== undefined) {
     e = {

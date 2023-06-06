@@ -9,13 +9,13 @@
  * @namespace simply
  */
 
-var WindowStack = require('ui/windowstack');
-var Card = require('ui/card');
-var Vibe = require('ui/vibe');
+var WindowStack = require("ui/windowstack");
+var Card = require("ui/card");
+var Vibe = require("ui/vibe");
 
 var simply = {};
 
-simply.text = function(textDef) {
+simply.text = function (textDef) {
   var wind = WindowStack.top();
   if (!wind || !(wind instanceof Card)) {
     wind = new Card(textDef);
@@ -31,7 +31,7 @@ simply.text = function(textDef) {
  * @memberOf simply
  * @param {string} [type=short] - The vibe type.
  */
-simply.vibe = function(type) {
+simply.vibe = function (type) {
   return Vibe.vibrate(type);
 };
 

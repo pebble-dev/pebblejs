@@ -1,20 +1,16 @@
-var util2 = require('util2');
-var myutil = require('myutil');
-var Propable = require('ui/propable');
-var StageElement = require('ui/element');
+var util2 = require("util2");
+var myutil = require("myutil");
+var Propable = require("ui/propable");
+var StageElement = require("ui/element");
 
-var accessorProps = [
-  'strokeColor',
-  'strokeWidth',
-  'position2',
-];
+var accessorProps = ["strokeColor", "strokeWidth", "position2"];
 
 var defaults = {
-  strokeColor: 'white',
+  strokeColor: "white",
   strokeWidth: 1,
 };
 
-var Line = function(elementDef) {
+var Line = function (elementDef) {
   StageElement.call(this, myutil.shadow(defaults, elementDef || {}));
   this.state.type = StageElement.LineType;
 };
