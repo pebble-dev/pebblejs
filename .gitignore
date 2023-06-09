@@ -1,0 +1,5 @@
+pebble-wrapper.sh
+build/
+.lock-waf*
+pebble-wrapper.sh
+*.pyc
