@@ -3,3 +3,4 @@ build/
 .lock-waf*
 pebble-wrapper.sh
 *.pyc
+site/
