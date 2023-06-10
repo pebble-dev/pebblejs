@@ -1,8 +1,8 @@
-var util2 = require('util2');
-var myutil = require('myutil');
-var StageElement = require('ui/element');
+var util2 = require("util2");
+var myutil = require("myutil");
+var StageElement = require("ui/element");
 
-var Inverter = function(elementDef) {
+var Inverter = function (elementDef) {
   StageElement.call(this, elementDef);
   this.state.type = StageElement.InverterType;
 };

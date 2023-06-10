@@ -1,4 +1,4 @@
-var Timeline = require('./timeline');
+var Timeline = require("./timeline");
 
 Timeline.init();
 

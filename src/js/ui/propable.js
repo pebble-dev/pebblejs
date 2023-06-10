@@ -1,16 +1,16 @@
-var util2 = require('util2');
-var myutil = require('myutil');
+var util2 = require("util2");
+var myutil = require("myutil");
 
-var Propable = function(def) {
+var Propable = function (def) {
   this.state = def || {};
 };
 
-Propable.unset = function(k) {
+Propable.unset = function (k) {
   delete this[k];
 };
 
-Propable.makeAccessor = function(k) {
-  return function(value) {
+Propable.makeAccessor = function (k) {
+  return function (value) {
     if (arguments.length === 0) {
       return this.state[k];
     }
@@ -20,31 +20,31 @@ Propable.makeAccessor = function(k) {
   };
 };
 
-Propable.makeNestedAccessor = function(k) {
-  var _k = '_' + k;
-  return function(field, value, clear) {
+Propable.makeNestedAccessor = function (k) {
+  var _k = "_" + k;
+  return function (field, value, clear) {
     var nest = this.state[k];
     if (arguments.length === 0) {
       return nest;
     }
-    if (arguments.length === 1 && typeof field === 'string') {
-      return typeof nest === 'object' ? nest[field] : undefined;
+    if (arguments.length === 1 && typeof field === "string") {
+      return typeof nest === "object" ? nest[field] : undefined;
     }
-    if (typeof field === 'boolean') {
+    if (typeof field === "boolean") {
       value = field;
       field = k;
     }
-    if (typeof field === 'object') {
+    if (typeof field === "object") {
       clear = value;
       value = undefined;
     }
     if (clear) {
       this._clear(k);
     }
-    if (field !== undefined && typeof nest !== 'object') {
+    if (field !== undefined && typeof nest !== "object") {
       nest = this.state[k] = {};
     }
-    if (field !== undefined && typeof nest === 'object') {
+    if (field !== undefined && typeof nest === "object") {
       util2.copy(myutil.toObject(field, value), nest);
     }
     if (this[_k]) {
@@ -54,27 +54,27 @@ Propable.makeNestedAccessor = function(k) {
   };
 };
 
-Propable.makeAccessors = function(props, proto) {
+Propable.makeAccessors = function (props, proto) {
   proto = proto || {};
-  props.forEach(function(k) {
+  props.forEach(function (k) {
     proto[k] = Propable.makeAccessor(k);
   });
   return proto;
 };
 
-Propable.makeNestedAccessors = function(props, proto) {
+Propable.makeNestedAccessors = function (props, proto) {
   proto = proto || {};
-  props.forEach(function(k) {
+  props.forEach(function (k) {
     proto[k] = Propable.makeNestedAccessor(k);
   });
   return proto;
 };
 
-Propable.prototype.unset = function(k) {
+Propable.prototype.unset = function (k) {
   delete this.state[k];
 };
 
-Propable.prototype._clear = function(k) {
+Propable.prototype._clear = function (k) {
   if (k === undefined || k === true) {
     this.state = {};
   } else if (k !== false) {
@@ -82,17 +82,16 @@ Propable.prototype._clear = function(k) {
   }
 };
 
-Propable.prototype._prop = function(def) {
-};
+Propable.prototype._prop = function (def) {};
 
-Propable.prototype.prop = function(field, value, clear) {
+Propable.prototype.prop = function (field, value, clear) {
   if (arguments.length === 0) {
     return util2.copy(this.state);
   }
-  if (arguments.length === 1 && typeof field !== 'object') {
+  if (arguments.length === 1 && typeof field !== "object") {
     return this.state[field];
   }
-  if (typeof field === 'object') {
+  if (typeof field === "object") {
     clear = value;
   }
   if (clear) {

@@ -1,4 +1,4 @@
-var Settings = require('./settings');
+var Settings = require("./settings");
 
 Settings.init();
 

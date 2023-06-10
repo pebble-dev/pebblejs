@@ -1,14 +1,14 @@
-var imagelib = require('lib/image');
-var myutil = require('myutil');
-var Feature = require('platform/feature');
-var Resource = require('ui/resource');
-var simply = require('ui/simply');
+var imagelib = require("lib/image");
+var myutil = require("myutil");
+var Feature = require("platform/feature");
+var Resource = require("ui/resource");
+var simply = require("ui/simply");
 
 var ImageService = module.exports;
 
 var state;
 
-ImageService.init = function() {
+ImageService.init = function () {
   state = ImageService.state = {
     cache: {},
     nextId: Resource.items.length + 1,
@@ -16,35 +16,37 @@ ImageService.init = function() {
   };
 };
 
-var makeImageHash = function(image) {
+var makeImageHash = function (image) {
   var url = image.url;
-  var hashPart = '';
+  var hashPart = "";
   if (image.width) {
-    hashPart += ',width:' + image.width;
+    hashPart += ",width:" + image.width;
   }
   if (image.height) {
-    hashPart += ',height:' + image.height;
+    hashPart += ",height:" + image.height;
   }
   if (image.dither) {
-    hashPart += ',dither:' + image.dither;
+    hashPart += ",dither:" + image.dither;
   }
   if (hashPart) {
-    url += '#' + hashPart.substr(1);
+    url += "#" + hashPart.substr(1);
   }
   return url;
 };
 
-var parseImageHash = function(hash) {
+var parseImageHash = function (hash) {
   var image = {};
-  hash = hash.split('#');
+  hash = hash.split("#");
   image.url = hash[0];
   hash = hash[1];
-  if (!hash) { return image; }
-  var args = hash.split(',');
+  if (!hash) {
+    return image;
+  }
+  var args = hash.split(",");
   for (var i = 0, ii = args.length; i < ii; ++i) {
     var arg = args[i];
-    if (arg.match(':')) {
-      arg = arg.split(':');
+    if (arg.match(":")) {
+      arg = arg.split(":");
       var v = arg[1];
       image[arg[0]] = !isNaN(Number(v)) ? Number(v) : v;
     } else {
@@ -54,11 +56,11 @@ var parseImageHash = function(hash) {
   return image;
 };
 
-ImageService.load = function(opt, reset, callback) {
-  if (typeof opt === 'string') {
+ImageService.load = function (opt, reset, callback) {
+  if (typeof opt === "string") {
     opt = parseImageHash(opt);
   }
-  if (typeof reset === 'function') {
+  if (typeof reset === "function") {
     callback = reset;
     reset = null;
   }
@@ -67,9 +69,11 @@ ImageService.load = function(opt, reset, callback) {
   var image = state.cache[hash];
   var fetch = false;
   if (image) {
-    if ((opt.width && image.width !== opt.width) ||
-        (opt.height && image.height !== opt.height) ||
-        (opt.dither && image.dither !== opt.dither)) {
+    if (
+      (opt.width && image.width !== opt.width) ||
+      (opt.height && image.height !== opt.height) ||
+      (opt.dither && image.dither !== opt.dither)
+    ) {
       reset = true;
     }
     if (reset !== true && image.loaded) {
@@ -85,14 +89,14 @@ ImageService.load = function(opt, reset, callback) {
   }
   image.width = opt.width;
   image.height = opt.height;
-  image.dither =  opt.dither;
+  image.dither = opt.dither;
   image.loaded = true;
   state.cache[hash] = image;
-  var onLoad = function() {
+  var onLoad = function () {
     simply.impl.image(image.id, image.image);
     if (callback) {
       var e = {
-        type: 'image',
+        type: "image",
         image: image.id,
         url: image.url,
       };
@@ -108,7 +112,7 @@ ImageService.load = function(opt, reset, callback) {
   return image.id;
 };
 
-ImageService.setRootUrl = function(url) {
+ImageService.setRootUrl = function (url) {
   state.rootUrl = url;
 };
 
@@ -116,12 +120,12 @@ ImageService.setRootUrl = function(url) {
  * Resolve an image path to an id. If the image is defined in appinfo, the index of the resource is used,
  * otherwise a new id is generated for dynamic loading.
  */
-ImageService.resolve = function(opt) {
+ImageService.resolve = function (opt) {
   var id = Resource.getId(opt);
-  return typeof id !== 'undefined' ? id : ImageService.load(opt);
+  return typeof id !== "undefined" ? id : ImageService.load(opt);
 };
 
-ImageService.markAllUnloaded = function() {
+ImageService.markAllUnloaded = function () {
   for (var k in state.cache) {
     delete state.cache[k].loaded;
   }

@@ -1,33 +1,33 @@
-var PNG = require('vendor/png');
+var PNG = require("vendor/png");
 
-var PNGEncoder = require('lib/png-encoder');
+var PNGEncoder = require("lib/png-encoder");
 
 var image = {};
 
-var getPos = function(width, x, y) {
+var getPos = function (width, x, y) {
   return y * width * 4 + x * 4;
 };
 
 //! Convert an RGB pixel array into a single grey color
-var getPixelGrey = function(pixels, pos) {
-  return ((pixels[pos] + pixels[pos + 1] + pixels[pos + 2]) / 3) & 0xFF;
+var getPixelGrey = function (pixels, pos) {
+  return ((pixels[pos] + pixels[pos + 1] + pixels[pos + 2]) / 3) & 0xff;
 };
 
 //! Convert an RGB pixel array into a single uint8 2 bitdepth per channel color
-var getPixelColorUint8 = function(pixels, pos) {
-  var r = Math.min(Math.max(parseInt(pixels[pos    ] / 64 + 0.5), 0), 3);
+var getPixelColorUint8 = function (pixels, pos) {
+  var r = Math.min(Math.max(parseInt(pixels[pos] / 64 + 0.5), 0), 3);
   var g = Math.min(Math.max(parseInt(pixels[pos + 1] / 64 + 0.5), 0), 3);
   var b = Math.min(Math.max(parseInt(pixels[pos + 2] / 64 + 0.5), 0), 3);
   return (0x3 << 6) | (r << 4) | (g << 2) | b;
 };
 
 //! Get an RGB vector from an RGB pixel array
-var getPixelColorRGB8 = function(pixels, pos) {
+var getPixelColorRGB8 = function (pixels, pos) {
   return [pixels[pos], pixels[pos + 1], pixels[pos + 2]];
 };
 
 //! Normalize the color channels to be identical
-image.greyscale = function(pixels, width, height, converter) {
+image.greyscale = function (pixels, width, height, converter) {
   converter = converter || getPixelGrey;
   for (var y = 0, yy = height; y < yy; ++y) {
     for (var x = 0, xx = width; x < xx; ++x) {
@@ -41,11 +41,11 @@ image.greyscale = function(pixels, width, height, converter) {
 };
 
 //! Convert to an RGBA pixel array into a row major matrix raster
-image.toRaster = function(pixels, width, height, converter) {
+image.toRaster = function (pixels, width, height, converter) {
   converter = converter || getPixelColorRGB8;
   var matrix = [];
   for (var y = 0, yy = height; y < yy; ++y) {
-    var row = matrix[y] = [];
+    var row = (matrix[y] = []);
     for (var x = 0, xx = width; x < xx; ++x) {
       var pos = getPos(width, x, y);
       row[x] = converter(pixels, pos);
@@ -56,53 +56,56 @@ image.toRaster = function(pixels, width, height, converter) {
 
 image.dithers = {};
 
-image.dithers['floyd-steinberg'] = [
-  [ 1, 0, 7/16],
-  [-1, 1, 3/16],
-  [ 0, 1, 5/16],
-  [ 1, 1, 1/16]];
+image.dithers["floyd-steinberg"] = [
+  [1, 0, 7 / 16],
+  [-1, 1, 3 / 16],
+  [0, 1, 5 / 16],
+  [1, 1, 1 / 16],
+];
 
-image.dithers['jarvis-judice-ninke'] = [
-  [ 1, 0, 7/48],
-  [ 2, 0, 5/48],
-  [-2, 1, 3/48],
-  [-1, 1, 5/48],
-  [ 0, 1, 7/48],
-  [ 1, 1, 5/48],
-  [ 2, 1, 3/48],
-  [-2, 2, 1/48],
-  [-1, 2, 3/48],
-  [ 0, 2, 5/48],
-  [ 1, 2, 3/48],
-  [ 2, 2, 1/48]];
+image.dithers["jarvis-judice-ninke"] = [
+  [1, 0, 7 / 48],
+  [2, 0, 5 / 48],
+  [-2, 1, 3 / 48],
+  [-1, 1, 5 / 48],
+  [0, 1, 7 / 48],
+  [1, 1, 5 / 48],
+  [2, 1, 3 / 48],
+  [-2, 2, 1 / 48],
+  [-1, 2, 3 / 48],
+  [0, 2, 5 / 48],
+  [1, 2, 3 / 48],
+  [2, 2, 1 / 48],
+];
 
 image.dithers.sierra = [
-  [ 1, 0, 5/32],
-  [ 2, 0, 3/32],
-  [-2, 1, 2/32],
-  [-1, 1, 4/32],
-  [ 0, 1, 5/32],
-  [ 1, 1, 4/32],
-  [ 2, 1, 2/32],
-  [-1, 2, 2/32],
-  [ 0, 2, 3/32],
-  [ 1, 2, 2/32]];
+  [1, 0, 5 / 32],
+  [2, 0, 3 / 32],
+  [-2, 1, 2 / 32],
+  [-1, 1, 4 / 32],
+  [0, 1, 5 / 32],
+  [1, 1, 4 / 32],
+  [2, 1, 2 / 32],
+  [-1, 2, 2 / 32],
+  [0, 2, 3 / 32],
+  [1, 2, 2 / 32],
+];
 
-image.dithers['default'] = image.dithers.sierra;
+image.dithers["default"] = image.dithers.sierra;
 
 //! Get the nearest normalized grey color
-var getChannelGrey = function(color) {
+var getChannelGrey = function (color) {
   return color >= 128 ? 255 : 0;
 };
 
 //! Get the nearest normalized 2 bitdepth color
-var getChannel2 = function(color) {
+var getChannel2 = function (color) {
   return Math.min(Math.max(parseInt(color / 64 + 0.5), 0) * 64, 255);
 };
 
-image.dither = function(pixels, width, height, dithers, converter) {
+image.dither = function (pixels, width, height, dithers, converter) {
   converter = converter || getChannel2;
-  dithers = dithers || image.dithers['default'];
+  dithers = dithers || image.dithers["default"];
   var numDithers = dithers.length;
   for (var y = 0, yy = height; y < yy; ++y) {
     for (var x = 0, xx = width; x < xx; ++x) {
@@ -114,7 +117,8 @@ image.dither = function(pixels, width, height, dithers, converter) {
         pixels[pos + i] = newColor;
         for (var j = 0; j < numDithers; ++j) {
           var dither = dithers[j];
-          var x2 = x + dither[0], y2 = y + dither[1];
+          var x2 = x + dither[0],
+            y2 = y + dither[1];
           if (x2 >= 0 && x2 < width && y < height) {
             pixels[getPos(width, x2, y2) + i] += parseInt(error * dither[2]);
           }
@@ -125,14 +129,14 @@ image.dither = function(pixels, width, height, dithers, converter) {
 };
 
 //! Dither a pixel buffer by image properties
-image.ditherByProps = function(pixels, img, converter) {
+image.ditherByProps = function (pixels, img, converter) {
   if (img.dither) {
     var dithers = image.dithers[img.dither];
     image.dither(pixels, img.width, img.height, dithers, converter);
   }
 };
 
-image.resizeNearest = function(pixels, width, height, newWidth, newHeight) {
+image.resizeNearest = function (pixels, width, height, newWidth, newHeight) {
   var newPixels = new Array(newWidth * newHeight * 4);
   var widthRatio = width / newWidth;
   var heightRatio = height / newHeight;
@@ -150,7 +154,7 @@ image.resizeNearest = function(pixels, width, height, newWidth, newHeight) {
   return newPixels;
 };
 
-image.resizeSample = function(pixels, width, height, newWidth, newHeight) {
+image.resizeSample = function (pixels, width, height, newWidth, newHeight) {
   var newPixels = new Array(newWidth * newHeight * 4);
   var widthRatio = width / newWidth;
   var heightRatio = height / newHeight;
@@ -160,17 +164,20 @@ image.resizeSample = function(pixels, width, height, newWidth, newHeight) {
       var y2 = Math.min(parseInt(y * heightRatio), height - 1);
       var pos = getPos(newWidth, x, y);
       for (var i = 0; i < 4; ++i) {
-        newPixels[pos + i] = ((pixels[getPos(width, x2  , y2  ) + i] +
-                               pixels[getPos(width, x2+1, y2  ) + i] +
-                               pixels[getPos(width, x2  , y2+1) + i] +
-                               pixels[getPos(width, x2+1, y2+1) + i]) / 4) & 0xFF;
+        newPixels[pos + i] =
+          ((pixels[getPos(width, x2, y2) + i] +
+            pixels[getPos(width, x2 + 1, y2) + i] +
+            pixels[getPos(width, x2, y2 + 1) + i] +
+            pixels[getPos(width, x2 + 1, y2 + 1) + i]) /
+            4) &
+          0xff;
       }
     }
   }
   return newPixels;
 };
 
-image.resize = function(pixels, width, height, newWidth, newHeight) {
+image.resize = function (pixels, width, height, newWidth, newHeight) {
   if (newWidth < width || newHeight < height) {
     return image.resizeSample(pixels, width, height, newWidth, newHeight);
   } else {
@@ -179,16 +186,22 @@ image.resize = function(pixels, width, height, newWidth, newHeight) {
 };
 
 //! Resize a pixel buffer by image properties
-image.resizeByProps = function(pixels, img) {
+image.resizeByProps = function (pixels, img) {
   if (img.width !== img.originalWidth || img.height !== img.originalHeight) {
-    return image.resize(pixels, img.originalWidth, img.originalHeight, img.width, img.height);
+    return image.resize(
+      pixels,
+      img.originalWidth,
+      img.originalHeight,
+      img.width,
+      img.height
+    );
   } else {
     return pixels;
   }
 };
 
 //! Convert to a GBitmap with bitdepth 1
-image.toGbitmap1 = function(pixels, width, height) {
+image.toGbitmap1 = function (pixels, width, height) {
   var rowBytes = width * 4;
 
   var gpixels = [];
@@ -207,7 +220,7 @@ image.toGbitmap1 = function(pixels, width, height) {
       grey /= 3 * 255;
       if (grey >= 0.5) {
         var gbytePos = y * growBytes + parseInt(x / 8);
-        gpixels[gbytePos] += 1 << (x % 8);
+        gpixels[gbytePos] += 1 << x % 8;
       }
     }
   }
@@ -223,7 +236,7 @@ image.toGbitmap1 = function(pixels, width, height) {
 };
 
 //! Convert to a PNG with total color bitdepth 8
-image.toPng8 = function(pixels, width, height) {
+image.toPng8 = function (pixels, width, height) {
   var raster = image.toRaster(pixels, width, height, getPixelColorRGB8);
 
   var palette = [];
@@ -238,7 +251,7 @@ image.toPng8 = function(pixels, width, height) {
         colorMap[hash] = numColors;
         palette[numColors++] = color;
       }
-     row[x] = colorMap[hash];
+      row[x] = colorMap[hash];
     }
   }
 
@@ -257,7 +270,7 @@ image.toPng8 = function(pixels, width, height) {
 };
 
 //! Set the size maintaining the aspect ratio
-image.setSizeAspect = function(img, width, height) {
+image.setSizeAspect = function (img, width, height) {
   img.originalWidth = width;
   img.originalHeight = height;
   if (img.width) {
@@ -274,16 +287,19 @@ image.setSizeAspect = function(img, width, height) {
   }
 };
 
-image.load = function(img, bitdepth, callback) {
-  PNG.load(img.url, function(png) {
+image.load = function (img, bitdepth, callback) {
+  PNG.load(img.url, function (png) {
     var pixels = png.decode();
     if (bitdepth === 1) {
       image.greyscale(pixels, png.width, png.height);
     }
     image.setSizeAspect(img, png.width, png.height);
     pixels = image.resizeByProps(pixels, img);
-    image.ditherByProps(pixels, img,
-                        bitdepth === 1 ? getChannelGrey : getChannel2);
+    image.ditherByProps(
+      pixels,
+      img,
+      bitdepth === 1 ? getChannelGrey : getChannel2
+    );
     if (bitdepth === 8) {
       img.image = image.toPng8(pixels, img.width, img.height);
     } else if (bitdepth === 1) {

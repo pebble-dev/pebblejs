@@ -1,9 +1,9 @@
-var util2 = require('util2');
-var Emitter = require('emitter');
-var Settings = require('settings');
-var simply = require('ui/simply');
+var util2 = require("util2");
+var Emitter = require("emitter");
+var Settings = require("settings");
+var simply = require("ui/simply");
 
-var Wakeup = function() {
+var Wakeup = function () {
   this.init();
 };
 
@@ -11,23 +11,23 @@ Wakeup.prototype.cleanupGracePeriod = 60 * 5;
 
 util2.copy(Emitter.prototype, Wakeup.prototype);
 
-Wakeup.prototype.init = function() {
+Wakeup.prototype.init = function () {
   this._setRequests = [];
   this._launchCallbacks = [];
   this._loadData();
   this._cleanup();
 };
 
-Wakeup.prototype._loadData = function() {
-  this.state = Settings._loadData(null, 'wakeup', true) || {};
+Wakeup.prototype._loadData = function () {
+  this.state = Settings._loadData(null, "wakeup", true) || {};
   this.state.wakeups = this.state.wakeups || {};
 };
 
-Wakeup.prototype._saveData = function() {
-  Settings._saveData(null, 'wakeup', this.state);
+Wakeup.prototype._saveData = function () {
+  Settings._saveData(null, "wakeup", this.state);
 };
 
-Wakeup.prototype._cleanup = function() {
+Wakeup.prototype._cleanup = function () {
   var id;
   var ids = [];
   for (id in this.state.wakeups) {
@@ -48,7 +48,7 @@ Wakeup.prototype._cleanup = function() {
   }
 };
 
-Wakeup.prototype.get = function(id) {
+Wakeup.prototype.get = function (id) {
   var wakeup = this.state.wakeups[id];
   if (wakeup) {
     return {
@@ -61,7 +61,7 @@ Wakeup.prototype.get = function(id) {
   }
 };
 
-Wakeup.prototype.each = function(callback) {
+Wakeup.prototype.each = function (callback) {
   var i = 0;
   for (var id in this.state.wakeups) {
     if (callback(this.get(id), i++) === false) {
@@ -70,8 +70,8 @@ Wakeup.prototype.each = function(callback) {
   }
 };
 
-Wakeup.prototype.schedule = function(opt, callback) {
-  if (typeof opt !== 'object' || opt instanceof Date) {
+Wakeup.prototype.schedule = function (opt, callback) {
+  if (typeof opt !== "object" || opt instanceof Date) {
     opt = { time: opt };
   }
   var cookie = opt.cookie || 0;
@@ -80,13 +80,13 @@ Wakeup.prototype.schedule = function(opt, callback) {
     data: opt.data,
     callback: callback,
   });
-  this.launch(function() {
+  this.launch(function () {
     simply.impl.wakeupSet(opt.time, cookie, opt.notifyIfMissed);
   });
 };
 
-Wakeup.prototype.cancel = function(id) {
-  if (id === 'all') {
+Wakeup.prototype.cancel = function (id) {
+  if (id === "all") {
     this.state.wakeups = {};
   } else {
     delete this.state.wakeups[id];
@@ -94,7 +94,7 @@ Wakeup.prototype.cancel = function(id) {
   simply.impl.wakeupCancel(id);
 };
 
-Wakeup.prototype.launch = function(callback) {
+Wakeup.prototype.launch = function (callback) {
   if (this._launchEvent) {
     callback(this._launchEvent);
   } else {
@@ -102,7 +102,7 @@ Wakeup.prototype.launch = function(callback) {
   }
 };
 
-Wakeup.prototype._makeBaseEvent = function(id, cookie) {
+Wakeup.prototype._makeBaseEvent = function (id, cookie) {
   var wakeup = this.state.wakeups[id];
   var e = {
     id: id,
@@ -114,7 +114,7 @@ Wakeup.prototype._makeBaseEvent = function(id, cookie) {
   return e;
 };
 
-Wakeup.prototype._makeWakeupEvent = function(id, cookie) {
+Wakeup.prototype._makeWakeupEvent = function (id, cookie) {
   var e;
   if (id !== undefined) {
     e = this._makeBaseEvent(id, cookie);
@@ -125,25 +125,25 @@ Wakeup.prototype._makeWakeupEvent = function(id, cookie) {
   return e;
 };
 
-Wakeup.prototype._setWakeup = function(id, wakeup) {
+Wakeup.prototype._setWakeup = function (id, wakeup) {
   this.state.wakeups[id] = wakeup;
   this._saveData();
 };
 
-Wakeup.prototype._removeWakeup = function(id) {
+Wakeup.prototype._removeWakeup = function (id) {
   if (id in this.state.wakeups) {
     delete this.state.wakeups[id];
     this._saveData();
   }
 };
 
-Wakeup.prototype.emitSetResult = function(id, cookie) {
+Wakeup.prototype.emitSetResult = function (id, cookie) {
   var req = this._setRequests.shift();
   if (!req) {
     return;
   }
   var e;
-  if (typeof id === 'number') {
+  if (typeof id === "number") {
     this._setWakeup(id, {
       id: id,
       cookie: cookie,
@@ -163,7 +163,7 @@ Wakeup.prototype.emitSetResult = function(id, cookie) {
   return req.callback(e);
 };
 
-Wakeup.prototype.emitWakeup = function(id, cookie) {
+Wakeup.prototype.emitWakeup = function (id, cookie) {
   var e = this._makeWakeupEvent(id, cookie);
 
   if (!this._launchEvent) {
@@ -177,13 +177,13 @@ Wakeup.prototype.emitWakeup = function(id, cookie) {
 
   if (e.wakeup) {
     this._removeWakeup(id);
-    if (this.emit('wakeup', e) === false) {
+    if (this.emit("wakeup", e) === false) {
       return false;
     }
   }
 };
 
-Wakeup.prototype._emitWakeupLaunch = function(e) {
+Wakeup.prototype._emitWakeupLaunch = function (e) {
   this._launchEvent = e;
 
   var callbacks = this._launchCallbacks;

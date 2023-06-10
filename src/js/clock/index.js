@@ -1,3 +1,3 @@
-var Clock = require('./clock');
+var Clock = require("./clock");
 
 module.exports = Clock;

@@ -1,23 +1,23 @@
-var util2 = require('util2');
-var Vector2 = require('vector2');
-var myutil = require('myutil');
-var WindowStack = require('ui/windowstack');
-var Propable = require('ui/propable');
-var simply = require('ui/simply');
+var util2 = require("util2");
+var Vector2 = require("vector2");
+var myutil = require("myutil");
+var WindowStack = require("ui/windowstack");
+var Propable = require("ui/propable");
+var simply = require("ui/simply");
 
 var elementProps = [
-  'position',
-  'size',
-  'backgroundColor',
-  'borderColor',
-  'borderWidth',
+  "position",
+  "size",
+  "backgroundColor",
+  "borderColor",
+  "borderWidth",
 ];
 
 var accessorProps = elementProps;
 
 var nextId = 1;
 
-var StageElement = function(elementDef) {
+var StageElement = function (elementDef) {
   this.state = elementDef || {};
   this.state.id = nextId++;
   if (!this.state.position) {
@@ -30,17 +30,17 @@ var StageElement = function(elementDef) {
 };
 
 var Types = [
-  'NoneType',
-  'RectType',
-  'LineType',
-  'CircleType',
-  'RadialType',
-  'TextType',
-  'ImageType',
-  'InverterType',
+  "NoneType",
+  "RectType",
+  "LineType",
+  "CircleType",
+  "RadialType",
+  "TextType",
+  "ImageType",
+  "InverterType",
 ];
 
-Types.forEach(function(name, index) {
+Types.forEach(function (name, index) {
   StageElement[name] = index;
 });
 
@@ -48,48 +48,57 @@ util2.copy(Propable.prototype, StageElement.prototype);
 
 Propable.makeAccessors(accessorProps, StageElement.prototype);
 
-StageElement.prototype._reset = function() {
+StageElement.prototype._reset = function () {
   this._queue = [];
 };
 
-StageElement.prototype._id = function() {
+StageElement.prototype._id = function () {
   return this.state.id;
 };
 
-StageElement.prototype._type = function() {
+StageElement.prototype._type = function () {
   return this.state.type;
 };
 
-StageElement.prototype._prop = function(elementDef) {
+StageElement.prototype._prop = function (elementDef) {
   if (this.parent === WindowStack.top()) {
     simply.impl.stageElement(this._id(), this._type(), this.state);
   }
 };
 
-StageElement.prototype.index = function() {
-  if (!this.parent) { return -1; }
+StageElement.prototype.index = function () {
+  if (!this.parent) {
+    return -1;
+  }
   return this.parent.index(this);
 };
 
-StageElement.prototype.remove = function(broadcast) {
-  if (!this.parent) { return this; }
+StageElement.prototype.remove = function (broadcast) {
+  if (!this.parent) {
+    return this;
+  }
   this.parent.remove(this, broadcast);
   return this;
 };
 
-StageElement.prototype._animate = function(animateDef, duration) {
+StageElement.prototype._animate = function (animateDef, duration) {
   if (this.parent === WindowStack.top()) {
-    simply.impl.stageAnimate(this._id(), this.state,
-        animateDef, duration || 400, animateDef.easing || 'easeInOut');
+    simply.impl.stageAnimate(
+      this._id(),
+      this.state,
+      animateDef,
+      duration || 400,
+      animateDef.easing || "easeInOut"
+    );
   }
 };
 
-StageElement.prototype.animate = function(field, value, duration) {
-  if (typeof field === 'object') {
+StageElement.prototype.animate = function (field, value, duration) {
+  if (typeof field === "object") {
     duration = value;
   }
   var animateDef = myutil.toObject(field, value);
-  this.queue(function() {
+  this.queue(function () {
     this._animate(animateDef, duration);
     util2.copy(animateDef, this.state);
   });
@@ -99,11 +108,11 @@ StageElement.prototype.animate = function(field, value, duration) {
   return this;
 };
 
-StageElement.prototype.queue = function(callback) {
+StageElement.prototype.queue = function (callback) {
   this._queue.push(callback);
 };
 
-StageElement.prototype.dequeue = function() {
+StageElement.prototype.dequeue = function () {
   var callback = this._queue.shift();
   if (callback) {
     this.state.animating = true;
@@ -113,10 +122,12 @@ StageElement.prototype.dequeue = function() {
   }
 };
 
-StageElement.emitAnimateDone = function(id) {
+StageElement.emitAnimateDone = function (id) {
   var wind = WindowStack.top();
-  if (!wind || !wind._dynamic) { return; }
-  wind.each(function(element) {
+  if (!wind || !wind._dynamic) {
+    return;
+  }
+  wind.each(function (element) {
     if (element._id() === id) {
       element.dequeue();
       return false;
