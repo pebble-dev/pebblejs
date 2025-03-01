@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "module": "CommonJS",
+        "incremental": true,
+        "declaration": true,
+        "outDir": "./build/",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": true,
+        "allowJs": false
+
+    },
+    "include": [
+        "src/pkjs/**/*.ts"
+, "src/pkjs/Pebble.d.ts", "src/pkjs/index.ts"    ], // pebblekit "ts"
+}
