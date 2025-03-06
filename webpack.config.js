@@ -10,7 +10,7 @@ const SDK_PATH = () => {
 }
 
 module.exports = {
-  entry: [path.join(SDK_PATH(), 'pebble/common/include/_pkjs_shared_additions.js'), './src/pkjs/index.ts'],
+  entry: ['core-js/stable', path.join(SDK_PATH(), 'pebble/common/include/_pkjs_shared_additions.js'), './src/pkjs/index.ts'],
   devtool: 'source-map',
   mode: 'development',
   module: { 
@@ -24,12 +24,21 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    roots: [
+      SDK_PATH() + '/pebble/common/include',
+    ],
+    alias: {
+      'app_package.json': path.resolve(__dirname, './package.json'),
+      'message_keys': path.resolve(__dirname, './build/js/message_keys.json')
+    }
   },
+  target: 'es5',
   output: {
     filename: 'pebble-js-app.js',
     path: path.resolve(__dirname, './build'),
     sourceMapFilename: 'pebble-js-app.js.map',
     devtoolModuleFilenameTemplate: '[resource-path]',
     devtoolFallbackModuleFilenameTemplate: '[resource-path]?[hash]',
+    chunkFormat: 'commonjs',
   },
 };

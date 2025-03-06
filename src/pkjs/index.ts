@@ -1,5 +1,13 @@
-Pebble.addEventListener("ready",
-    function(e) {
-        console.log("Hello world! - Sent from your TypeScript application.");
-    }
-);
+import { PebbleJS } from "./pebblejs";
+
+
+Pebble.addEventListener("ready", () => {
+    const pebbleJS = new PebbleJS();
+    const ui = pebbleJS.UI();
+    
+    let card = ui.Card("Hello World", "This is a subtitle", "This is the body text");
+    card.show();
+
+
+   
+});

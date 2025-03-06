@@ -208,6 +208,7 @@ static void handle_packet(Simply *simply, Packet *packet) {
 }
 
 static void received_callback(DictionaryIterator *iter, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Received an AppMessage");
   Tuple *tuple = dict_find(iter, 0);
   if (!tuple) {
     return;
@@ -222,6 +223,7 @@ static void received_callback(DictionaryIterator *iter, void *context) {
 
   uint8_t *buffer = tuple->value->data;
   while (true) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Received a packet of length %d", length);
     Packet *packet = (Packet*) buffer;
     handle_packet(context, packet);
 

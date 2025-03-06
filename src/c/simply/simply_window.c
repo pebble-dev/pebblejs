@@ -420,6 +420,7 @@ static void prv_handle_window_action_bar_packet(Simply *simply, Packet *data) {
 bool simply_window_handle_packet(Simply *simply, Packet *packet) {
   switch (packet->type) {
     case CommandWindowProps:
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received window props");
       prv_handle_window_props_packet(simply, packet);
       return true;
     case CommandWindowButtonConfig:

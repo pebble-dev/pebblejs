@@ -429,7 +429,9 @@ static void handle_card_text_packet(Simply *simply, Packet *data) {
   }
   simply_ui_set_text(simply->ui, textfield_id, packet->text);
   if (!gcolor8_equal(packet->color, GColor8ClearWhite)) {
-    simply_ui_set_text_color(simply->ui, textfield_id, packet->color);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Setting text color");
+    // simply_ui_set_text_color(simply->ui, textfield_id, packet->color);
+    simply_ui_set_text_color(simply->ui, textfield_id, GColorBlack);
   }
 }
 
@@ -449,11 +451,13 @@ static void handle_card_style_packet(Simply *simply, Packet *data) {
 }
 
 bool simply_ui_handle_packet(Simply *simply, Packet *packet) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Received packet of type %d", packet->type);
   switch (packet->type) {
     case CommandCardClear:
       handle_card_clear_packet(simply, packet);
       return true;
     case CommandCardText:
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received card text packet");
       handle_card_text_packet(simply, packet);
       return true;
     case CommandCardImage:
