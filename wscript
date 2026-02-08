@@ -118,7 +118,7 @@ def concat_javascript(ctx, js_path=None):
                 """ % (relpath))
             body = coffeescript.compile(body)
             # change ".coffee" or ".js.coffee" extensions to ".js"
-            relpath = re.sub('(\.js)?\.coffee$', '.js', relpath)
+            relpath = re.sub(r'(\.js)?\.coffee$', '.js', relpath)
             return relpath, body
 
         sources = []
